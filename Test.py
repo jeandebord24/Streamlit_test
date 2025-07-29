@@ -5,7 +5,7 @@ import time
 # CONFIGURATION DE LA PHRASE
 # -----------------------------
 PHRASE_DU_JOUR = "Je ne dois pas parler pendant les cours."
-NB_LIGNES_A_ECRIRE = 100
+NB_LIGNES_A_ECRIRE = 10
 
 # -----------------------------
 # INITIALISATION DES ETATS
@@ -22,7 +22,7 @@ if "finished" not in st.session_state:
 # -----------------------------
 # AFFICHAGE DE L'INTERFACE
 # -----------------------------
-st.title("📘 Punition du jour")
+st.title("📘 Phrase du jour")
 st.subheader(f"Écris la phrase ci-dessous {NB_LIGNES_A_ECRIRE} fois exactement à l'identique :")
 st.code(PHRASE_DU_JOUR)
 
@@ -61,10 +61,4 @@ if st.session_state.logs:
     for idx, t in st.session_state.logs[-5:]:
         st.write(f"Ligne {idx} : {t} sec")
 
-# -----------------------------
-# BOUTON DE RESET
-# -----------------------------
-if st.button("🔁 Réinitialiser le jeu"):
-    for key in ["count", "start_time", "logs", "finished"]:
-        st.session_state.pop(key, None)
-    st.experimental_rerun()
+
