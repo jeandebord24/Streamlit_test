@@ -1,76 +1,70 @@
 import streamlit as st
 import time
-from datetime import datetime
 
-
-# CONFIGURATION DE LA PHRASE À ÉCRIRE
+# -----------------------------
+# CONFIGURATION DE LA PHRASE
+# -----------------------------
 PHRASE_DU_JOUR = "Je ne dois pas parler pendant les cours."
+NB_LIGNES_A_ECRIRE = 100
 
-# Titre
-st.title("Phrase du jour")
-st.write("Écris la phrase ci-dessous **100 fois** exactement à l'identique.")
-
-# Affiche la phrase cible
-st.code(PHRASE_DU_JOUR)
-
-# Initialisation des variables de session
-if "start_time" not in st.session_state:
-    st.session_state.start_time = None
+# -----------------------------
+# INITIALISATION DES ETATS
+# -----------------------------
 if "count" not in st.session_state:
     st.session_state.count = 0
+if "start_time" not in st.session_state:
+    st.session_state.start_time = time.time()
 if "logs" not in st.session_state:
     st.session_state.logs = []
 if "finished" not in st.session_state:
     st.session_state.finished = False
 
-# Lancement du chrono au premier input
-if st.session_state.start_time is None:
-    st.session_state.start_time = time.time()
+# -----------------------------
+# AFFICHAGE DE L'INTERFACE
+# -----------------------------
+st.title("📘 Punition du jour")
+st.subheader(f"Écris la phrase ci-dessous {NB_LIGNES_A_ECRIRE} fois exactement à l'identique :")
+st.code(PHRASE_DU_JOUR)
 
-# Initialisation manuelle de la valeur dans session_state
-if "input_phrase" not in st.session_state:
-    st.session_state.input_phrase = ""
+st.markdown(f"**Progrès** : {st.session_state.count} / {NB_LIGNES_A_ECRIRE}")
 
-# Champ de texte contrôlé par la valeur dans session_state
-user_input = st.text_input("Ta phrase (exactement) :", value=st.session_state.input_phrase, key="input_phrase_field")
-aaa= st.session_state.input_phrase
-st.code(aaa)
-aaa
+# -----------------------------
+# FORMULAIRE DE SAISIE
+# -----------------------------
+with st.form("punition_form", clear_on_submit=True):
+    user_input = st.text_input("Ta phrase (exactement) :")
+    submitted = st.form_submit_button("Valider")
 
-
-def clear_text():
-    st.session_state["input_phrase_field"] = ""
-
-
-# Bouton pour valider
-if st.button("Valider") and not st.session_state.finished:
+# -----------------------------
+# TRAITEMENT DE LA REPONSE
+# -----------------------------
+if submitted and not st.session_state.finished:
     if user_input.strip() == PHRASE_DU_JOUR:
         st.session_state.count += 1
         elapsed_time = round(time.time() - st.session_state.start_time, 2)
         st.session_state.logs.append((st.session_state.count, elapsed_time))
-        clear_text
-                # 🔁 Réinitialise la phrase dans le champ
-        st.session_state.input_phrase = ""
-        
-        
-        if st.session_state.count >= 100:
+
+        if st.session_state.count >= NB_LIGNES_A_ECRIRE:
             st.session_state.finished = True
             st.success("🎉 Tu as fini les 100 lignes de punition !")
             st.balloons()
         else:
-            st.success(f"✅ Ligne {st.session_state.count}/100 validée.")
+            st.success(f"✅ Ligne {st.session_state.count}/{NB_LIGNES_A_ECRIRE} validée.")
     else:
         st.error("❌ La phrase est incorrecte. Vérifie l'orthographe exacte.")
 
-# Affichage du temps pour chaque ligne validée
+# -----------------------------
+# AFFICHAGE DES TEMPS RECENTS
+# -----------------------------
 if st.session_state.logs:
-    st.write("⏱️ Temps par ligne :")
-    for idx, t in st.session_state.logs[-5:]:  # Affiche les 5 dernières
+    st.write("⏱️ Temps par ligne (5 dernières) :")
+    for idx, t in st.session_state.logs[-5:]:
         st.write(f"Ligne {idx} : {t} sec")
 
-# Affichage du nombre restant
-if not st.session_state.finished:
-    st.info(f"Il te reste {100 - st.session_state.count} lignes.")
-
-
-
+# -----------------------------
+# BOUTON DE RESET
+# -----------------------------
+if st.button("🔁 Réinitialiser le jeu"):
+    for key in ["count", "start_time", "logs", "finished"]:
+        st.session_state.pop(key, None)
+    st.experimental_rerun()

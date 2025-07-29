@@ -15,11 +15,6 @@
 
 # COMMAND ----------
 
-dbutils.library.restartPython()
-
-
-# COMMAND ----------
-
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.wsgi import WSGIMiddleware
@@ -191,7 +186,10 @@ class DatabricksApp:
 
 dbx_app = DatabricksApp(8098)
 #dbx_app.mount_streamlit_app("/Workspace/Users/sd83199@inetpsa.com/Debug/my_demo_st.py")
-dbx_app.mount_streamlit_app("/Workspace/Users/sg19019@stellantis.com/Streamlit/Test.py")
+dbx_app.mount_streamlit_app("Test.py")
+import nest_asyncio
+nest_asyncio.apply()
+dbx_app.run()
 
 # COMMAND ----------
 
